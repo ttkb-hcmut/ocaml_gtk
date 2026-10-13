@@ -4,23 +4,25 @@
 
 (rule
  (targets GLib-2.0.xml)
- (action (run g-ir-generate -o GLib-2.0.xml %{env:PREFIX=/usr/local}/girepository-1.0/GLib-2.0.typelib))
+ ; (action (run g-ir-generate -o GLib-2.0.xml %{env:PREFIX=/usr/lib64}/girepository-1.0/GLib-2.0.typelib))
+ (action (run cp %{env:PREFIX=/usr/share}/gir-1.0/GLib-2.0.gir GLib-2.0.xml))
 )
 (rule
  (targets GObject-2.0.xml)
- (action (run g-ir-generate -o GObject-2.0.xml %{env:PREFIX=/usr/local}/girepository-1.0/GObject-2.0.typelib))
+ ; (action (run g-ir-generate -o GObject-2.0.xml %{env:PREFIX=/usr/lib64}/girepository-1.0/GObject-2.0.typelib))
+ (action (run cp %{env:PREFIX=/usr/share}/gir-1.0/GObject-2.0.gir GObject-2.0.xml))
 )
 (rule
  (targets Gdk-4.0.xml)
- (action (run g-ir-generate -o Gdk-4.0.xml %{env:PREFIX=/usr/local}/girepository-1.0/Gdk-4.0.typelib))
+ (action (run cp %{env:PREFIX=/usr/share}/gir-1.0/Gdk-4.0.gir Gdk-4.0.xml))
 )
 (rule
  (targets Gtk-4.0.xml)
- (action (run g-ir-generate -o Gtk-4.0.xml %{env:PREFIX=/usr/local}/girepository-1.0/Gtk-4.0.typelib))
+ (action (run cp %{env:PREFIX=/usr/share}/gir-1.0/Gtk-4.0.gir Gtk-4.0.xml))
 )
 (rule
  (targets Gio-2.0.xml)
- (action (run g-ir-generate -o Gio-2.0.xml %{env:PREFIX=/usr/local}/girepository-1.0/Gio-2.0.typelib))
+ (action (run g-ir-generate -o Gio-2.0.xml %{env:PREFIX=/usr/lib64}/girepository-1.0/Gio-2.0.typelib))
 )
 
 (rule
@@ -39,6 +41,7 @@
   (run ./discover.exe)))
 
 (library
+ (public_name ocaml_gtk)
  (name ocamlgtk)
  (wrapped false)
  ; (deps (filename Gtk.ml) (filename GObject.ml) (filename gobject0.ml) (filename Gio.ml Gdk)

@@ -76,9 +76,11 @@ t_field = "{http://www.gtk.org/introspection/core/1.0}field"
 t_method = "{http://www.gtk.org/introspection/core/1.0}method"
 t_parameters = "{http://www.gtk.org/introspection/core/1.0}parameters"
 t_parameter = "{http://www.gtk.org/introspection/core/1.0}parameter"
+t_instance_parameter = "{http://www.gtk.org/introspection/core/1.0}instance-parameter"
 t_return_value = "{http://www.gtk.org/introspection/core/1.0}return-value"
 t_type = "{http://www.gtk.org/introspection/core/1.0}type"
 t_array = "{http://www.gtk.org/introspection/core/1.0}array"
+t_vararg = "{http://www.gtk.org/introspection/core/1.0}..."
 t_property = "{http://www.gtk.org/introspection/core/1.0}property"
 t_signal = "{http://www.gtk.org/introspection/glib/1.0}signal"
 t_enumeration = "{http://www.gtk.org/introspection/core/1.0}enumeration"
@@ -486,6 +488,7 @@ _C_HEADERS = '''\
 #include <gio/gunixmounts.h>
 #include <gio/gunixoutputstream.h>
 #include <gio/gunixsocketaddress.h>
+#include <gio/gdesktopappinfo.h>
 #include <gtk/gtk.h>
 #include <gtk/gtkunixprint.h>
 #define CAML_NAME_SPACE
@@ -653,6 +656,7 @@ def compute_ancestors(ns_elem):
     has_ctors = False
     has_fields = False
     for ns_elem_child in ns_elem.xml:
+        if 'introspectable' in ns_elem_child.attrib and ns_elem_child.attrib['introspectable'] == '0': continue
         if ns_elem_child.tag == t_field:
             has_fields = True
         elif ns_elem_child.tag == t_constructor:
@@ -723,7 +727,13 @@ class BaseMethodParser:
         for m_elem in self.elem:
             if m_elem.tag == t_parameters:
                 for ps_elem in m_elem:
-                    assert ps_elem.tag == t_parameter
+                    if ps_elem.attrib['name'] == '...':
+                      print('Skipping a vararg')
+                      continue
+                    if ps_elem.tag == t_instance_parameter:
+                      print(f'Skipping {self.elem.attrib['name']=} instance parameter {[x.attrib['name'] for x in m_elem]}')
+                      continue
+                    assert (ps_elem.tag == t_parameter)
                     ps_name = ps_elem.attrib['name']
                     t = ElementType.make(ps_elem)
                     t.string_length_param_index = string_length_parameters.get((self.elem.attrib.get(a_identifier, None), ps_name), None)
@@ -975,10 +985,11 @@ def process_namespace(namespace, env):
             for c_elem in ns_elem:
                 if c_elem.get('deprecated', None) == '1':
                     continue
-                c_elem_name = c_elem.attrib['name']
                 if c_elem.tag == t_attribute:
+                    c_elem_name = c_elem.attrib['name']
                     pass
                 elif c_elem.tag == t_constructor:
+                    c_elem_name = c_elem.attrib['name']
                     parser = MethodParser(c_elem, cls.c_type_name, nse, ns)
                     params, result = parser.parse()
                     if params:
@@ -987,26 +998,33 @@ def process_namespace(namespace, env):
                         result = constructor.result
                         output_method_code(c_elem, nse, params, result, ml, cf)
                 elif c_elem.tag == t_method:
+                    c_elem_name = c_elem.attrib['name']
                     parser = MethodParser(c_elem, cls.c_type_name, nse, ns)
                     params, result = parser.parse()
                     if params:
                         ml_func = escape_ml_keyword(c_elem_name)
                         mparams = params.drop_first()
-                        method_name = nse.xml_method_names[c_elem_name]
-                        cls.methods.append(Method(method_name, mparams, result, ml_func, nse.name))
-                        output_method_code(c_elem, nse, params, result, ml, cf)
+                        if c_elem_name in nse.xml_method_names:
+                          method_name = nse.xml_method_names[c_elem_name]
+                          cls.methods.append(Method(method_name, mparams, result, ml_func, nse.name))
+                          output_method_code(c_elem, nse, params, result, ml, cf)
+                        else:
+                          # print(f"DEBUG: skipping {c_elem_name=}")
+                          pass
                     elif nse.qualified_name == 'Gio.Application' and c_elem_name == 'run':
                         ml('  external run: [>`GApplication] obj -> string array -> int = "ml_Gio_Application_run"')
                         cls.methods.append(GioApplicationRunMethod())
                         cf(_GIO_APPLICATION_RUN)
                 elif c_elem.tag == t_signal:
+                    c_elem_name = c_elem.attrib['name']
                     parser = SignalParser(c_elem, nse, ns)
                     params, result = parser.parse()
                     if params:
                         c_name = c_elem_name.replace('-', '_')
                         cls.signals.append(Signal(c_name, params, result, nse.name))
                         output_signal_code(c_elem, nse, params, result, ml, cf)
-                elif c_elem.tag == t_property and c_elem.get('writable', None) == '1' and 'setter' not in c_elem.attrib:
+                elif c_elem.tag == t_property and c_elem.get('writable', None) == '1' and 'setter' not in c_elem.attrib and ('introspectable' in c_elem.attrib and c_elem.attrib['introspectable'] == '1'):
+                    c_elem_name = c_elem.attrib['name']
                     property_name = c_elem.get('name')
                     ml_name = property_name.replace('-', '_')
                     setter_name = 'set_' + ml_name
