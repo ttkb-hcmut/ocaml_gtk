@@ -491,6 +491,7 @@ _C_HEADERS = '''\
 #include <gio/gdesktopappinfo.h>
 #include <gtk/gtk.h>
 #include <gtk/gtkunixprint.h>
+#include <libadwaita-1/adwaita.h>
 #define CAML_NAME_SPACE
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
@@ -1103,5 +1104,5 @@ def process_root(filepath):
         else:
             print('Ignoring "%s" element' % (e.tag,))
 
-for filepath in ['GLib-2.0.xml', 'GObject-2.0.xml', 'Gio-2.0.xml', 'Gdk-4.0.xml', 'Gtk-4.0.xml']:
+for filepath in ['GLib-2.0.xml', 'GObject-2.0.xml', 'Gio-2.0.xml', 'Gdk-4.0.xml', 'Gtk-4.0.xml', 'Adw-1.xml']:
     process_root(filepath)
