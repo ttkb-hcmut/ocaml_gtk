@@ -27,10 +27,21 @@ On Ubuntu 22.04.1, these system packages are required:
 * python3-minimal
 * libpython3.10-stdlib
 
+### Fedora
+
+On Fedora 41, these system packages are required:
+
+* gtk4-devel
+* gtk4-devel-tools
+* gobject-introspection
+* python3.10
+* python3.10-libs
+
 ## Compiling
 
 1. Set the PREFIX variable to the location where girepository-1.0 typelibs are installed
     - if using Ubuntu packages on x86-64, this is `/usr/lib/x86_64-linux-gnu`
+    - If using Fedora packages, this is `/usr/lib64`
     - if using Linux Brew, this is `/home/linuxbrew/.linuxbrew/lib`
 2. Run `dune build`
 3. Built example programme can be found at `_build/default/examples/example0.exe`
