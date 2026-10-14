@@ -741,7 +741,7 @@ class BaseMethodParser:
                       print('Skipping a vararg')
                       continue
                     if ps_elem.tag == t_instance_parameter:
-                      print(f'Skipping {self.elem.attrib['name']=} instance parameter {[x.attrib['name'] for x in m_elem]}')
+                      # print(f'Skipping {self.elem.attrib['name']=} instance parameter {[x.attrib['name'] for x in m_elem]}')
                       continue
                     assert (ps_elem.tag == t_parameter)
                     ps_name = ps_elem.attrib['name']
