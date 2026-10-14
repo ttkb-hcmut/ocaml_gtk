@@ -538,10 +538,14 @@ def ml_to_c_type(typ, ns):
         return Types('string', 'String_val(%s)', 'const char *', 'string', '%s', ((typ.string_length_param_index, 'caml_string_length(%s)'),) if typ.string_length_param_index is not None else ())
     elif name == 'gboolean':
         return Types('bool', 'Bool_val(%s)', 'gboolean', 'bool', '%s')
+    elif name == 'guint16':
+        return Types('int', 'Int_val(%s)', 'guint16', 'int', '%s')
     elif name == 'gint32':
         return Types('int', 'Long_val(%s)', 'gint32', 'int', '%s')
-    elif name == 'guint32':
-        return Types('int', 'Long_val(%s)', 'guint32', 'int', '%s')
+    elif name == 'gint':
+        return Types('int', 'Long_val(%s)', 'gint', 'int', '%s')
+    elif name == 'guint':
+        return Types('int', 'Long_val(%s)', 'guint', 'int', '%s')
     elif name == 'gint64':
         return Types('int64', 'Int64_val(%s)', 'gint64', 'int64', '%s')
     elif name == 'gdouble':
@@ -570,8 +574,14 @@ def c_to_ml_type(typ, ns):
     # TODO: We should not support allow_none either until we have some
     # mechanism for converting to an option type.
     name = typ.typename
+    if name == 'guint16':
+        return Types('int', 'Val_int(%s)', 'guint16', 'int', '%s')
     if name == 'gint32':
         return Types('int', 'Val_long(%s)', 'gint32', 'int', '%s')
+    elif name == 'gint':
+        return Types('int', 'Val_long(%s)', 'gint', 'int', '%s')
+    elif name == 'guint':
+        return Types('int', 'Val_long(%s)', 'guint', 'int', '%s')
     elif name == 'guint32':
         return Types('int', 'Val_long(%s)', 'guint32', 'int', '%s')
     elif name == 'gboolean':
