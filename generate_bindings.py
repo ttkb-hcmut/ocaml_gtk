@@ -955,7 +955,7 @@ def process_namespace(namespace, env):
             name = constant_xml.attrib['name']
             value = constant_xml.attrib['value']
             type_name = constant_xml.find(t_type).attrib['name']
-            if type_name in {'gint8', 'guint8', 'gint16', 'guint16', 'gint32', 'guint32', 'gdouble'}:
+            if type_name in {'gint', 'gint8', 'guint8', 'gint16', 'guint16', 'gint32', 'guint32', 'gdouble'}:
                 ml_value = value
             elif type_name == 'gboolean':
                 if value == '0':
