@@ -319,7 +319,7 @@ class ElementType:
             array = array_elem
             typ = array_elem.find(t_type)
             assert typ is not None, f"No type found for {elem}"
-        allow_none = elem.get('allow-none', "0") == "1"
+        allow_none = elem.get('nullable', "0") == "1"
         transfer_ownership = elem.get('transfer-ownership', None)
         direction = elem.get('direction', None)
         caller_allocates = elem.get('caller-allocates', None)
