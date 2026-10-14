@@ -1019,7 +1019,6 @@ def process_namespace(namespace, env):
                           cls.methods.append(Method(method_name, mparams, result, ml_func, nse.name))
                           output_method_code(c_elem, nse, params, result, ml, cf)
                         else:
-                          # print(f"DEBUG: skipping {c_elem_name=}")
                           pass
                     elif nse.qualified_name == 'Gio.Application' and c_elem_name == 'run':
                         ml('  external run: [>`GApplication] obj -> string array -> int = "ml_Gio_Application_run"')
